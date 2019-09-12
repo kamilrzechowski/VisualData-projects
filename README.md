@@ -22,7 +22,7 @@ nearest_neighbour_ratio - function checks euqlidean distance betwen all descript
 ### Procedures
 **Point3.m**  
 Point3 - it's point 3 (task 3) from project descripton. Procedure compute fixed_treshold, nearest_neighbour and nearest_neighbour_ratio for SIFT algorithm.  
-3. a. <font color="red">**MISSING!!!!** </font> Procedure extract a few hundred SIFT features from the test images and show the feature keypoints superimposed on top of obj1 5.JPG and obj1 t5.JPG.  
+3. a. - ![#f03c15](/static-img/11688220190216063048667.jpg) `#f03c15`**MISSING!!!!** Procedure extract a few hundred SIFT features from the test images and show the feature keypoints superimposed on top of obj1 5.JPG and obj1 t5.JPG.  
 3. b. Procedure execute "fixed threshold" matching algorithm.  
 3. c. Procedure execute the "nearest neighbor" matching algorithm.  
 3. d. Procedure execute the "nearest neighbor distance ratio" matching algorithm.  
