@@ -30,5 +30,5 @@ Point3 - it's point 3 (task 3) from project descripton. Procedure compute fixed_
 **Point2.m**  
 Point2.m - point 2 (task 3) from project description (missing 2.2. c. -> repeatability while image scaling for SIFT and SURF).   
 2.2. a. Procedure adjust threshold and extract keypoints for SIFT and SURF algorithms.  
-2.2. b. Procedure measure rotation repeatability for SURF and SIFT algorithm
+2.2. b. Procedure measure rotation repeatability for SURF and SIFT algorithm.  
 2.2. c. **MISSING**. Procedure measure scaling repeatability for SURF and SIFT algorithm.
