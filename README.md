@@ -27,7 +27,7 @@ Point2.m - point 2 (task 3) from project description (missing 2.2. c. -> repeata
 2.2. c. `**MISSING!!!!**` Procedure measure scaling repeatability for SURF and SIFT algorithm.  
 **Point3.m**  
 Point3 - it's point 3 (task 3) from project descripton. Procedure compute fixed_treshold, nearest_neighbour and nearest_neighbour_ratio for SIFT algorithm.  
-3. a. `**MISSING!!!!**` Procedure extracts a few hundred SIFT features from the test images and show the feature keypoints superimposed on top of obj1 5.JPG and obj1 t5.JPG.  
+3. a. `**MISSING!!!!**` Procedure extracts a few hundred SIFT features from the test images and shows feature keypoints superimposed on top of obj1 5.JPG and obj1 t5.JPG.  
 3. b. Procedure executes "fixed threshold" matching algorithm.  
 3. c. Procedure executes the "nearest neighbor" matching algorithm.  
 3. d. Procedure executes the "nearest neighbor distance ratio" matching algorithm.  
