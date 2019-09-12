@@ -7,7 +7,7 @@ Matlab code for SIFT and SURF keypoints extraction and descriptror matching.
 ### Functions
 **find_matches**
 find_matches - function, that find matches based on key_points distance |x-x'|<2 && |y-y'|<2   
-input: keypoints_ref
+input: keypoints_ref  
 **fixed_treshold**
 fixed_treshold - function, that find matches between two descriptors, based on fixed threshold distance  
 **point_rotation**
