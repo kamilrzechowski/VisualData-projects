@@ -1,0 +1,116 @@
+%% load images
+IR = imread('data1\obj1_5.JPG'); %reference image
+IT = imread('data1\obj1_t1.JPG'); %target image
+
+%convert in gray scale
+IR_surf = rgb2gray(IR); %for surf
+IR_sift = single(rgb2gray(IR)); %for sift
+
+%threshold for sift
+peak_th = 14;
+edge_th = 6;
+
+%num strongest kp for surf
+strongestSelected = 293;
+
+%scale paramiter
+m=1.2;
+% p=7;
+
+% repeatability score arrays
+RepeatabilitySift = zeros(1,9);
+RepeatabilitySurf = zeros(1,9);
+
+%% apply sift
+[fr,dr] = vl_sift(IR_sift,'PeakThresh', peak_th,'EdgeThresh', edge_th);
+%figure;
+% imshow(uint8(IR_sift));
+% h1 = vl_plotframe(fr(:,:));
+% h2 = vl_plotframe(fr(:,:));
+% set(h1,'color','k','linewidth',3);
+% set(h2,'color','y','linewidth',2);
+
+%% apply surf
+pointsR = detectSURFFeatures(IR_surf);
+%figure;
+% imshow(IR_surf); hold on;
+% plot(pointsR.selectStrongest(strongestSelected)); hold off;
+
+% %% coordination prediction SIFT
+% sift_location = fr(1:2,:);
+% sift_prediction = m.*sift_location;
+% 
+% 
+% 
+% %% coordination prediction SURF
+% surf_location = pointsR.selectStrongest(strongestSelected).Location;
+% surf_prediction = m.*surf_location;
+
+%% SIFT and SURF point location
+sift_location = fr(1:2,:);
+surf_location = pointsR.selectStrongest(strongestSelected).Location;
+
+%% for cross section
+for p=0:8
+    sf = m^p;
+%     p=3;
+    
+    %% SIFT SURF point prediction
+    sift_prediction = sf.*sift_location; %figure; plotv(sift_prediction);
+    surf_prediction = sf.*surf_location; %figure; plotv(surf_prediction);
+    
+    %% scale the image
+    IR_siftScale = imresize(IR_sift,sf);
+    IR_surfScale = imresize(IR_surf,sf);
+
+    %% finding SIFT keypoints in the scaled image
+    [frs,drs] = vl_sift(IR_siftScale,'PeakThresh', peak_th,'EdgeThresh', edge_th);
+%     %figure;
+%     % imshow(uint8(IR_siftScale));
+%     % h1s = vl_plotframe(frs(:,:));
+%     % h2s = vl_plotframe(frs(:,:));
+%     % set(h1s,'color','k','linewidth',3);
+%     % set(h2s,'color','y','linewidth',2);
+
+    %% finding SURF keypoints in the scaled image
+    pointsRs = detectSURFFeatures(IR_surfScale);
+%     figure;
+%     imshow(IR_surfScale); hold on;
+%     plot(pointsRs.selectStrongest(strongestSelected)); hold off;
+
+    %% Compare SIFT keypoints of the scaled image with prediction
+    scoreSift = 0;
+    for i=1:size(sift_prediction,2)
+        for j=1:size(frs,2)
+            if abs(frs(1,j)-sift_prediction(1,i)) <= 2 && abs(frs(2,j)-sift_prediction(2,i)) <= 2
+                scoreSift = scoreSift +1;
+                break;
+            end
+        end
+    end
+    disp(scoreSift);
+    rep_sift = scoreSift/size(sift_prediction,2);
+    disp(rep_sift);
+    RepeatabilitySift(1,p+1) = rep_sift;
+
+    %% compare SURF keyppoints of the scaled image with prediction
+    scoreSurf = 0;
+    for u=1:strongestSelected
+        for v=1:strongestSelected
+            if abs(pointsRs.selectStrongest(strongestSelected).Location(v,1)-surf_prediction(u,1))<=2 && abs(pointsRs.selectStrongest(strongestSelected).Location(v,2)-surf_prediction(u,2))<=2
+                scoreSurf = scoreSurf +1;
+                break;
+            end
+        end
+    end
+    disp('surf point matched');
+    disp(scoreSurf);
+    rep_surf = scoreSurf/strongestSelected;
+    disp('surf repeatability score');
+    disp(rep_surf);
+    RepeatabilitySurf(1,p+1) = rep_surf;
+
+end
+%% plot results
+plot(RepeatabilitySift); hold on;
+plot(RepeatabilitySurf); hold off;
