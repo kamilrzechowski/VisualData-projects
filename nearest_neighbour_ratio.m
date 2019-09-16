@@ -1,4 +1,4 @@
-function matches = nearest_neighbour_ratio(descriptor_ref,descriptor_target)
+function matches = nearest_neighbour_ratio(descriptor_ref,descriptor_target, threshold)
 %UNTITLED5 Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -31,7 +31,7 @@ function matches = nearest_neighbour_ratio(descriptor_ref,descriptor_target)
             end
         end
         ratio = nearest_neigbour/second_nearest_neighbour;
-        if ratio < 0.8  % match found 
+        if ratio < threshold  % match found 
             matches_counter = matches_counter + 1;
             matches_tmp(1,matches_counter) = j;
             matches_tmp(2,matches_counter) = nearest_neaigbour_loc;
