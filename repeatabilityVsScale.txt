@@ -9,13 +9,10 @@ IR_sift = single(rgb2gray(IR)); %for sift
 %threshold for sift
 peak_th = 14;
 edge_th = 6;
+strongThresh = 7500;
 
-%num strongest kp for surf
-strongestSelected = 293;
-
-%scale paramiter
+%scale parameter
 m=1.2;
-% p=7;
 
 % repeatability score arrays
 RepeatabilitySift = zeros(1,9);
@@ -23,41 +20,34 @@ RepeatabilitySurf = zeros(1,9);
 
 %% apply sift
 [fr,dr] = vl_sift(IR_sift,'PeakThresh', peak_th,'EdgeThresh', edge_th);
-%figure;
-% imshow(uint8(IR_sift));
-% h1 = vl_plotframe(fr(:,:));
-% h2 = vl_plotframe(fr(:,:));
-% set(h1,'color','k','linewidth',3);
-% set(h2,'color','y','linewidth',2);
+figure; 
+imshow(uint8(IR_sift));
+h1 = vl_plotframe(fr(:,:));
+h2 = vl_plotframe(fr(:,:));
+set(h1,'color','k','linewidth',3);
+set(h2,'color','y','linewidth',2);
+title('SIFT keypoints');
+saveas(gcf,'SiftKeypoints.jpg');
 
 %% apply surf
-pointsR = detectSURFFeatures(IR_surf);
-%figure;
-% imshow(IR_surf); hold on;
-% plot(pointsR.selectStrongest(strongestSelected)); hold off;
-
-% %% coordination prediction SIFT
-% sift_location = fr(1:2,:);
-% sift_prediction = m.*sift_location;
-% 
-% 
-% 
-% %% coordination prediction SURF
-% surf_location = pointsR.selectStrongest(strongestSelected).Location;
-% surf_prediction = m.*surf_location;
+pointsR = detectSURFFeatures(IR_surf,'MetricThreshold',strongThresh);
+figure;
+imshow(IR_surf); hold on;
+plot(pointsR); hold off;
+title('SURF keypoints');
+saveas(gcf,'SurftKeypoints.jpg');
 
 %% SIFT and SURF point location
 sift_location = fr(1:2,:);
-surf_location = pointsR.selectStrongest(strongestSelected).Location;
+surf_location = pointsR.Location;
 
 %% for cross section
 for p=0:8
     sf = m^p;
-%     p=3;
-    
+
     %% SIFT SURF point prediction
-    sift_prediction = sf.*sift_location; %figure; plotv(sift_prediction);
-    surf_prediction = sf.*surf_location; %figure; plotv(surf_prediction);
+    sift_prediction = sf.*sift_location; 
+    surf_prediction = sf.*surf_location; 
     
     %% scale the image
     IR_siftScale = imresize(IR_sift,sf);
@@ -65,18 +55,9 @@ for p=0:8
 
     %% finding SIFT keypoints in the scaled image
     [frs,drs] = vl_sift(IR_siftScale,'PeakThresh', peak_th,'EdgeThresh', edge_th);
-%     %figure;
-%     % imshow(uint8(IR_siftScale));
-%     % h1s = vl_plotframe(frs(:,:));
-%     % h2s = vl_plotframe(frs(:,:));
-%     % set(h1s,'color','k','linewidth',3);
-%     % set(h2s,'color','y','linewidth',2);
 
     %% finding SURF keypoints in the scaled image
-    pointsRs = detectSURFFeatures(IR_surfScale);
-%     figure;
-%     imshow(IR_surfScale); hold on;
-%     plot(pointsRs.selectStrongest(strongestSelected)); hold off;
+    pointsRs = detectSURFFeatures(IR_surfScale,'MetricThreshold', strongThresh);
 
     %% Compare SIFT keypoints of the scaled image with prediction
     scoreSift = 0;
@@ -95,9 +76,9 @@ for p=0:8
 
     %% compare SURF keyppoints of the scaled image with prediction
     scoreSurf = 0;
-    for u=1:strongestSelected
-        for v=1:strongestSelected
-            if abs(pointsRs.selectStrongest(strongestSelected).Location(v,1)-surf_prediction(u,1))<=2 && abs(pointsRs.selectStrongest(strongestSelected).Location(v,2)-surf_prediction(u,2))<=2
+    for u=1:size(surf_prediction,1)
+        for v=1:size(pointsRs.Location,1)
+            if abs(pointsRs.Location(v,1)-surf_prediction(u,1))<=2 && abs(pointsRs.Location(v,2)-surf_prediction(u,2))<=2
                 scoreSurf = scoreSurf +1;
                 break;
             end
@@ -105,12 +86,17 @@ for p=0:8
     end
     disp('surf point matched');
     disp(scoreSurf);
-    rep_surf = scoreSurf/strongestSelected;
+    rep_surf = scoreSurf/size(surf_prediction,1);
     disp('surf repeatability score');
     disp(rep_surf);
     RepeatabilitySurf(1,p+1) = rep_surf;
 
 end
 %% plot results
-plot(RepeatabilitySift); hold on;
-plot(RepeatabilitySurf); hold off;
+figure;
+plot(RepeatabilitySift,'-*'); hold on;
+plot(RepeatabilitySurf,'-+'); hold off;
+title('Repeatability SIFT SURF vs Scale');
+legend('repeatability SIFT','repeatability SURF');
+% savefig('repScoreSurfSiftVsScale.fig');
+saveas(gcf,'repScoreSurfSiftVsScale.jpg');
