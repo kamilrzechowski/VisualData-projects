@@ -4,4 +4,6 @@ Analysis and Search of Visual Data.
 
 Python code for k-means visual vocbulary tree building, for image classification
 
-### Files
+### Files  
+-myTree - class to build a tree
+-
