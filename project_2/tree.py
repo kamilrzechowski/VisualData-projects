@@ -89,7 +89,7 @@ def build_tree(parent, depth, num_of_clusters):
         tmp_list = []
         if(len(clustres[labels[a][0]]) > 0):
             tmp_list.extend(clustres[labels[a][0]])
-        tmp_list.append(descriptor.Descriptor(data_set_list[a].descriptor, data_set_list[a].obj_num))
+        tmp_list.append(descriptor.Descriptor(data_set_list_1[a].descriptor, data_set_list_1[a].obj_num))
         clustres[labels[a][0]] = tmp_list
     
     ## recursive tree building (further dividing into clusters)
@@ -102,20 +102,29 @@ def build_tree(parent, depth, num_of_clusters):
             build_tree(child, depth, num_of_clusters)
             
 
-build_tree(root,3,4)
+build_tree(root,3,3)
     
 ##test
 am = root.getChildren()
 test = am[0].data.list_of_descriptors
-am2 = am[0].getChildren()
-test2a = am2[0].data.list_of_descriptors
-test2b = am2[1].data.list_of_descriptors
-test2c = am2[2].data.list_of_descriptors
+am2a = am[0].getChildren()
+test2a = am2a[0].data.list_of_descriptors
+test2b = am2a[1].data.list_of_descriptors
+test2c = am2a[2].data.list_of_descriptors
 
-am2a = am[1].getChildren()
-test2d = am2a[0].data.list_of_descriptors
-test2e = am2a[1].data.list_of_descriptors
-test2f = am2a[2].data.list_of_descriptors
+am2b = am[1].getChildren()
+am2c = am[2].getChildren()
 
-am2b = am[2].getChildren()
-am2c = am[3].getChildren()
+
+
+am3a = am2a[0].getChildren()
+am3b = am2a[1].getChildren()
+am3c = am2a[2].getChildren()
+
+am3d = am2b[0].getChildren()
+am3e = am2b[1].getChildren()
+am3f = am2b[2].getChildren()
+
+am3g = am2c[0].getChildren()
+am3h = am2c[1].getChildren()
+am3i = am2c[2].getChildren()
