@@ -6,11 +6,11 @@ Python code for k-means visual vocbulary tree building, for image classification
 
 ### Files  
 **myTree.py**  
-myTree - class contain functions for builidng and using a tree.  
+myTree - class contains functions for builidng and using a tree.  
 **descriptor.py**  
-descriptor.py - class geather descriptor and object number from each descriptor comes from.  
+descriptor.py - class geathers descriptor and object number from each descriptor comes from.  
 **nodeData.py**  
-nodeData.py - class conatin all data from one node. List of descriptors belonging to that node (list of class descriptor), list of weights for each object and center of cluster  
+nodeData.py - class conatins all data from one node. List of descriptors belonging to that node (list of class descriptor), list of weights for each object and center of cluster  
 **tree.py**  
 tree.py - file contain funciont for building a K-means tree, based on set of descriptor vecotrs. Main function "def build_tree(parent, depth, num_of_clusters)"  
 
