@@ -13,12 +13,13 @@ import nodeData
 import myTree
 import math
 
-
+obj_num = 50
+num_features_obj_list = []  #number of features per object. First object - first place in the list. lenght 50
+'''
 #global variables
 path = 'C:\Kamil\VCC-KTH\Visual data analysis\projects\project2\client'
 descriptors_list  = []
-num_of_clusters = 3
-num_features_obj_list = []  #number of features per object. First object - first place in the list. lenght 50
+#num_of_clusters = 3
 
 files = []
 # r=root, d=directories, f = files
@@ -43,8 +44,19 @@ for obj in range(len(descriptors_list)):
         data_set_list.append(descriptor.Descriptor(descriptors_list[obj_num][des], obj_num))
     obj_num += 1
 
-root = myTree.Tree(nodeData.NodeData(data_set_list,0,0))
+root = myTree.Tree(nodeData.NodeData(data_set_list,0,0))'''
 
+# compute number of descriptors per object
+def compute_features_num(des_list):
+    for i in range(len(des_list)):
+        num = des_list[i].obj_num
+        if num not in num_features_obj_list:
+            num_features_obj_list.append(num)
+        else:
+            num_features_obj_list[num] += 1;
+    
+
+# descriptore_list - list of descriptors in given node, obj_num - total number of objects to recognise
 def calcualte_weights(descriptore_list, obj_num):
     obj_in_node_list = []    #list of different objects in node
     obj_occurance_num_list = [ 0 for i in range(obj_num) ] #list with number of occurance of each object in current node
@@ -59,7 +71,7 @@ def calcualte_weights(descriptore_list, obj_num):
     ## calculate weights for node
     w = [ 0 for i in range(obj_num) ]
     for i in range(len(w)):
-        w[i] = (obj_occurance_num_list[i]/obj_count)*math.log2(obj_num/obj_count)
+        w[i] = (obj_occurance_num_list[i]/num_features_obj_list[i])*math.log2((obj_num)/obj_count)
         
     return w
     
@@ -79,7 +91,12 @@ def build_tree(parent, depth, num_of_clusters):
     # Set flags (Just to avoid line break in the code)
     flags = cv2.KMEANS_RANDOM_CENTERS
     # Apply KMeans ---------- data, num of clusters, criteria, attempts, flags
+    if(len(descriptors) < num_of_clusters):
+        return
     compactness,labels,centers = cv2.kmeans(descriptors,num_of_clusters,None,criteria,10,flags)
+    
+    if(len(num_features_obj_list) == 0):
+        compute_features_num(data_set_list_1)
     
     
     clustres = [ [] for i in range(num_of_clusters) ]
@@ -89,6 +106,8 @@ def build_tree(parent, depth, num_of_clusters):
         tmp_list = []
         if(len(clustres[labels[a][0]]) > 0):
             tmp_list.extend(clustres[labels[a][0]])
+        if(a > len(data_set_list_1)):
+            print("error")
         tmp_list.append(descriptor.Descriptor(data_set_list_1[a].descriptor, data_set_list_1[a].obj_num))
         clustres[labels[a][0]] = tmp_list
     
@@ -97,21 +116,64 @@ def build_tree(parent, depth, num_of_clusters):
         depth -= 1
         for i in range(num_of_clusters):
             w = calcualte_weights(clustres[i],obj_num)
-            child = myTree.Tree(nodeData.NodeData(clustres[i],centers,w))
+            child = myTree.Tree(nodeData.NodeData(clustres[i],np.float32(centers[i]),w))
             parent.addChild(child)
             build_tree(child, depth, num_of_clusters)
             
+            
+def build_tree_lite(data, parent, depth, num_of_clusters):
+    ###
+    #   k-nn means
+    ###    
+    descriptors = []
+    data_set_list_1 = data
+    for obj in range(len(data_set_list_1)):
+        descriptors.append(data_set_list_1[obj].descriptor)
+    # convert to np.float32
+    descriptors = np.float32(descriptors)
+    # Define criteria = ( type, max_iter = 10 , epsilon = 1.0 )
+    criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 10, 1.0)
+    # Set flags (Just to avoid line break in the code)
+    flags = cv2.KMEANS_RANDOM_CENTERS
+    # Apply KMeans ---------- data, num of clusters, criteria, attempts, flags
+    if(len(descriptors) < num_of_clusters):
+        return
+    compactness,labels,centers = cv2.kmeans(descriptors,num_of_clusters,None,criteria,10,flags)
+    
+    if(len(num_features_obj_list) == 0):
+        compute_features_num(data_set_list_1)
+    
+    
+    clustres = [ [] for i in range(num_of_clusters) ]
+    
+    ## segregate data into clusters
+    for a in range(len(labels)):
+        tmp_list = []
+        if(len(clustres[labels[a][0]]) > 0):
+            tmp_list.extend(clustres[labels[a][0]])
+        if(a > len(data_set_list_1)):
+            print("error")
+        tmp_list.append(descriptor.Descriptor(data_set_list_1[a].descriptor, data_set_list_1[a].obj_num))
+        clustres[labels[a][0]] = tmp_list
+    
+    ## recursive tree building (further dividing into clusters)
+    if(depth > 0):
+        depth -= 1
+        for i in range(num_of_clusters):
+            w = calcualte_weights(clustres[i],obj_num)
+            if(depth == 0):
+                child = myTree.Tree(nodeData.NodeData(clustres[i],np.float32(centers[i]),w))
+            else:
+                child = myTree.Tree(nodeData.NodeData(0,np.float32(centers[i]),w))
+            parent.addChild(child)
+            build_tree_lite(clustres[i],child, depth, num_of_clusters)
 
-build_tree(root,3,3)
+'''build_tree(root,3,3)
     
 ##test
 am = root.getChildren()
-test = am[0].data.list_of_descriptors
+#test = am[0].data.list_of_descriptors
 am2a = am[0].getChildren()
-test2a = am2a[0].data.list_of_descriptors
-test2b = am2a[1].data.list_of_descriptors
-test2c = am2a[2].data.list_of_descriptors
-
 am2b = am[1].getChildren()
 am2c = am[2].getChildren()
 
@@ -127,4 +189,4 @@ am3f = am2b[2].getChildren()
 
 am3g = am2c[0].getChildren()
 am3h = am2c[1].getChildren()
-am3i = am2c[2].getChildren()
+am3i = am2c[2].getChildren()'''
