@@ -15,11 +15,11 @@ import math
 
 obj_num = 50
 num_features_obj_list = []  #number of features per object. First object - first place in the list. lenght 50
+
 '''
 #global variables
 path = 'C:\Kamil\VCC-KTH\Visual data analysis\projects\project2\client'
 descriptors_list  = []
-#num_of_clusters = 3
 
 files = []
 # r=root, d=directories, f = files
@@ -34,8 +34,6 @@ for r, d, f in os.walk(path):
             descriptors_list.append(des)
             num_features_obj_list.append(len(des))
 
-
-
 #object descriptor assigning
 obj_num = 0
 data_set_list  = []
@@ -43,17 +41,18 @@ for obj in range(len(descriptors_list)):
     for des in range(len(descriptors_list[obj])):
         data_set_list.append(descriptor.Descriptor(descriptors_list[obj_num][des], obj_num))
     obj_num += 1
+'''
 
-root = myTree.Tree(nodeData.NodeData(data_set_list,0,0))'''
+
 
 # compute number of descriptors per object
 def compute_features_num(des_list):
     for i in range(len(des_list)):
         num = des_list[i].obj_num
-        if num not in num_features_obj_list:
-            num_features_obj_list.append(num)
-        else:
-            num_features_obj_list[num] += 1;
+        if(len(num_features_obj_list) < num + 1):
+            for a in range((num + 1) - len(num_features_obj_list)):
+                num_features_obj_list.append(0)
+        num_features_obj_list[num] += 1;
     
 
 # descriptore_list - list of descriptors in given node, obj_num - total number of objects to recognise
@@ -69,8 +68,8 @@ def calcualte_weights(descriptore_list, obj_num):
     obj_count = len(obj_in_node_list)    #number of different objects in a node
     
     ## calculate weights for node
-    w = [ 0 for i in range(obj_num) ]
-    for i in range(len(w)):
+    w = [ 0 for i in range(len(num_features_obj_list)) ]
+    for i in range(len(num_features_obj_list)):
         w[i] = (obj_occurance_num_list[i]/num_features_obj_list[i])*math.log2((obj_num)/obj_count)
         
     return w
@@ -106,8 +105,6 @@ def build_tree(parent, depth, num_of_clusters):
         tmp_list = []
         if(len(clustres[labels[a][0]]) > 0):
             tmp_list.extend(clustres[labels[a][0]])
-        if(a > len(data_set_list_1)):
-            print("error")
         tmp_list.append(descriptor.Descriptor(data_set_list_1[a].descriptor, data_set_list_1[a].obj_num))
         clustres[labels[a][0]] = tmp_list
     
@@ -151,8 +148,6 @@ def build_tree_lite(data, parent, depth, num_of_clusters):
         tmp_list = []
         if(len(clustres[labels[a][0]]) > 0):
             tmp_list.extend(clustres[labels[a][0]])
-        if(a > len(data_set_list_1)):
-            print("error")
         tmp_list.append(descriptor.Descriptor(data_set_list_1[a].descriptor, data_set_list_1[a].obj_num))
         clustres[labels[a][0]] = tmp_list
     
@@ -168,7 +163,12 @@ def build_tree_lite(data, parent, depth, num_of_clusters):
             parent.addChild(child)
             build_tree_lite(clustres[i],child, depth, num_of_clusters)
 
-'''build_tree(root,3,3)
+
+'''
+root = myTree.Tree(nodeData.NodeData(0,0,0))
+build_tree_lite(data_set_list,root,3,4)
+#root = myTree.Tree(nodeData.NodeData(data_set_list,0,0))
+#build_tree(root,3,3)
     
 ##test
 am = root.getChildren()
@@ -189,4 +189,5 @@ am3f = am2b[2].getChildren()
 
 am3g = am2c[0].getChildren()
 am3h = am2c[1].getChildren()
-am3i = am2c[2].getChildren()'''
+am3i = am2c[2].getChildren()
+'''

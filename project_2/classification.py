@@ -21,7 +21,6 @@ path = 'C:\Kamil\VCC-KTH\Visual data analysis\projects\project2\client'
 descriptors_list  = []
 num_features_obj_list = []  #number of features per object. First object - first place in the list. lenght 50
 
-files = []
 # r=root, d=directories, f = files
 for r, d, f in os.walk(path):
     for file in f:
@@ -33,6 +32,8 @@ for r, d, f in os.walk(path):
             kp, des = sift.detectAndCompute(gray,None)
             descriptors_list.append(des)
             num_features_obj_list.append(len(des))
+
+files = f[1:]
 
 #object descriptor assigning
 obj_num = 0
@@ -51,7 +52,7 @@ tree.build_tree_lite(data_set_list,root,3,4)
 ###
 #   detection
 ###
-img = cv2.imread('C:\Kamil\VCC-KTH\Visual data analysis\projects\project2\client\obj1_t1.JPG')
+img = cv2.imread('C:\Kamil\VCC-KTH\Visual data analysis\projects\project2\client\obj3_t1.JPG')
 gray= cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
 
 sift = cv2.xfeatures2d.SIFT_create(300)
@@ -77,14 +78,12 @@ def find_des_leaf(parent,single_des):
         #choose cloest node
         which_node.sort(key=takeDistance)
         leaf = find_des_leaf(children[which_node[0].node_index],single_des)
-        #data1 = leaf.data.list_of_descriptors
-        #data2 = leaf.data.weights
         return leaf
     else:
         return parent
 
 def detection():
-    obj_prob = [ objectScore.ObjectScore(i,0) for i in range(obj_num) ]
+    obj_prob = [ objectScore.ObjectScore(i,0,'') for i in range(obj_num) ]
     for i in range(len(des)):
         des_leaf = find_des_leaf(root,des[i])
         for obj in range(len(obj_prob)):
@@ -95,3 +94,5 @@ def detection():
 
 
 object_probability = detection()
+for elem in range(len(object_probability)):
+    object_probability[elem].file_name = files[object_probability[elem].obj]
