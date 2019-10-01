@@ -14,26 +14,16 @@ import descriptor
 import nodeData
 import closestNode
 import objectScore
+import merge
+import pickle
 
-
+'''
 #global variables
-path = 'C:\Kamil\VCC-KTH\Visual data analysis\projects\project2\client'
+#path = 'C:\Kamil\VCC-KTH\Visual data analysis\projects\project2\client'
+path = 'C:\Kamil\VCC-KTH\Visual data analysis\projects\project2\server'
 descriptors_list  = []
-num_features_obj_list = []  #number of features per object. First object - first place in the list. lenght 50
 
-# r=root, d=directories, f = files
-for r, d, f in os.walk(path):
-    for file in f:
-        if '.JPG' in file:
-            img = cv2.imread(os.path.join(r, file))
-            gray= cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-            
-            sift = cv2.xfeatures2d.SIFT_create(300)
-            kp, des = sift.detectAndCompute(gray,None)
-            descriptors_list.append(des)
-            num_features_obj_list.append(len(des))
-
-files = f[1:]
+descriptors_list, files = merge.get_data(path)
 
 #object descriptor assigning
 obj_num = 0
@@ -46,7 +36,19 @@ for obj in range(len(descriptors_list)):
 #root = myTree.Tree(nodeData.NodeData(data_set_list,0,0))
 #tree.build_tree(root,3,4)
 root = myTree.Tree(nodeData.NodeData(0,0,0))
-tree.build_tree_lite(data_set_list,root,3,4)
+tree.build_tree_lite(data_set_list,root,7,4)
+
+with open('treeD7B4.pkl', 'wb') as output:
+    pickle.dump(root, output, pickle.HIGHEST_PROTOCOL)
+    pickle.dump(files, output, pickle.HIGHEST_PROTOCOL)
+    pickle.dump(obj_num, output, pickle.HIGHEST_PROTOCOL)
+    
+'''
+with open('treeD7B4.pkl', 'rb') as input:
+    root = pickle.load(input)
+    files = pickle.load(input)
+    obj_num = pickle.load(input)
+    
 
 
 ###

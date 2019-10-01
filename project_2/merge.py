@@ -7,18 +7,9 @@ Created on Mon Sep 30 23:34:04 2019
 import cv2
 import numpy as np
 import os
-import myTree
-import tree
-import descriptor
-import nodeData
-import closestNode
-import objectScore
-
 
 #global variables
-path = 'C:\Kamil\VCC-KTH\Visual data analysis\projects\project2\server'
-descriptors_list  = []
-num_features_obj_list = []  #number of features per object. First object - first place in the list. lenght 50
+#path = 'C:\Kamil\VCC-KTH\Visual data analysis\projects\project2\server'
 # create BFMatcher object
 bf = cv2.BFMatcher()
 
@@ -43,33 +34,39 @@ def merge_descriptors(desc_list):
     
     return merged_desc
 
-done_files = []
-# r=root, d=directories, f = files
-for r, d, f in os.walk(path):
-    for file in f:
-        if '.JPG' in file:
-            sam_obj_list = []
-            if file not in done_files:
-                look_for = file[:5]
-                sam_obj_list.append(file)
-                done_files.append(file)
-                for elem in f:
-                    if look_for in elem and file != elem:
-                        sam_obj_list.append(elem)
-                        done_files.append(elem)
-            
-            if(len(sam_obj_list) > 0):
-                descriptors2merge = []
-                for elem in range(len(sam_obj_list)):
-                    img = cv2.imread(os.path.join(r, sam_obj_list[elem]))
-                    gray= cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-                    
-                    sift = cv2.xfeatures2d.SIFT_create(100)
-                    kp, des = sift.detectAndCompute(gray,None)
-                    descriptors2merge.append(des)
+def get_data(path):
+    done_files = []
+    descriptors_list  = []
+    object_list = []
+    # r=root, d=directories, f = files
+    for r, d, f in os.walk(path):
+        for file in f:
+            if '.JPG' in file:
+                sam_obj_list = []
+                if file not in done_files:
+                    look_for = file[:5]
+                    sam_obj_list.append(file)
+                    done_files.append(file)
+                    for elem in f:
+                        if look_for in elem and file != elem:
+                            sam_obj_list.append(elem)
+                            done_files.append(elem)
                 
-                merged_desc = merge_descriptors(descriptors2merge)
-                descriptors_list.append(merged_desc)
+                if(len(sam_obj_list) > 0):
+                    descriptors2merge = []
+                    for elem in range(len(sam_obj_list)):
+                        img = cv2.imread(os.path.join(r, sam_obj_list[elem]))
+                        gray= cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+                        
+                        sift = cv2.xfeatures2d.SIFT_create(300)
+                        kp, des = sift.detectAndCompute(gray,None)
+                        descriptors2merge.append(des)
+                    
+                    merged_desc = merge_descriptors(descriptors2merge)
+                    descriptors_list.append(np.float32(merged_desc[0]))
+                    object_list.append(sam_obj_list[0])
+                    
+    return descriptors_list, object_list
                 
                 
                 
