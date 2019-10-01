@@ -44,6 +44,7 @@ with open('treeD7B4.pkl', 'wb') as output:
     pickle.dump(obj_num, output, pickle.HIGHEST_PROTOCOL)
     
 '''
+# load tree from file
 with open('treeD7B4.pkl', 'rb') as input:
     root = pickle.load(input)
     files = pickle.load(input)
@@ -54,11 +55,6 @@ with open('treeD7B4.pkl', 'rb') as input:
 ###
 #   detection
 ###
-img = cv2.imread('C:\Kamil\VCC-KTH\Visual data analysis\projects\project2\client\obj3_t1.JPG')
-gray= cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-
-sift = cv2.xfeatures2d.SIFT_create(300)
-kp, des = sift.detectAndCompute(gray,None)
 
 # take distance to sort
 def takeDistance(elem):
@@ -84,7 +80,7 @@ def find_des_leaf(parent,single_des):
     else:
         return parent
 
-def detection():
+def detection(des):
     obj_prob = [ objectScore.ObjectScore(i,0,'') for i in range(obj_num) ]
     for i in range(len(des)):
         des_leaf = find_des_leaf(root,des[i])
@@ -95,6 +91,29 @@ def detection():
     return obj_prob
 
 
-object_probability = detection()
-for elem in range(len(object_probability)):
-    object_probability[elem].file_name = files[object_probability[elem].obj]
+correct = 0
+# r=root, d=directories, f = files
+for r, d, f in os.walk('C:\Kamil\VCC-KTH\Visual data analysis\projects\project2\client'):
+    for file in f:
+        if '.JPG' in file:
+            #img = cv2.imread('C:\Kamil\VCC-KTH\Visual data analysis\projects\project2\client\obj3_t1.JPG')
+            img = cv2.imread(os.path.join(r, file))
+            gray= cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+            
+            sift = cv2.xfeatures2d.SIFT_create(300)
+            kp, des = sift.detectAndCompute(gray,None)
+            
+            # get classification array for current image
+            object_probability = detection(des)
+            # assign file names for each image id
+            for elem in range(len(object_probability)):
+                object_probability[elem].file_name = files[object_probability[elem].obj]
+            #check if file was correctly classified
+            if(file[:5] == object_probability[0].file_name[:5]):
+                correct += 1
+            print("img: " + file + " classified as: " + object_probability[0].file_name + "\n\r")
+          
+# overall classification score
+score = correct/obj_num
+print("socre = " + str(score))
+                

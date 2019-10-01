@@ -12,10 +12,9 @@ import numpy
 #===== variable s=====
 num_kp = 150
 test_img = []
-Kp = []
 testKeypoints = []
-Desc = []
 testDescriptor = []
+path = 'C:/Kamil/VCC-KTH/Visual data analysis/projects/project2/server/obj'
 
 #==== detector and matcher ====
 sift = cv2.xfeatures2d.SIFT_create(num_kp)
@@ -23,9 +22,11 @@ bf = cv2.BFMatcher()
 
 for j in range(1,51):
     sameImage = []
+    Desc = []
+    Kp = []
     for i in range(1,4):
-        if os.path.exists('D:/user/D_UNI/EIT_Digital_Master/YEAR_2/SearchVisualData/Project2/Data2/server/obj'+str(j)+'_'+str(i)+'.jpg'):
-            image = cv2.imread('D:/user/D_UNI/EIT_Digital_Master/YEAR_2/SearchVisualData/Project2/Data2/server/obj'+str(j)+'_'+str(i)+'.jpg', cv2.IMREAD_GRAYSCALE)
+        if os.path.exists(path + str(j)+'_'+str(i)+'.JPG'):
+            image = cv2.imread(path + str(j)+'_'+str(i)+'.JPG', cv2.IMREAD_GRAYSCALE)
             keypoints, descriptors = sift.detectAndCompute(image, None)
         if i == 1:
             temp_descriptor = descriptors
